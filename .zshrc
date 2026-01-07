@@ -103,5 +103,12 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
+# fnm
+FNM_PATH="/home/glichtert/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "`fnm env`"
+fi
+
 export PATH="$PATH:$HOME/Applications/idea/bin/"
 eval $(thefuck --alias)
