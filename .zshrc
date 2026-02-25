@@ -112,3 +112,11 @@ fi
 
 export PATH="$PATH:$HOME/Applications/idea/bin/"
 eval $(thefuck --alias)
+
+# Thesis related
+THESIS_PATH="$HOME/Documents/thesis/haai/executables/bin"
+if [ -d "$THESIS_PATH" ]; then
+    export PATH="$THESIS_PATH":"$PATH"
+fi
+export PATH
+
