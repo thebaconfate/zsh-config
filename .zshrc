@@ -81,19 +81,18 @@ FNM_PATH="$HOME/.local/share/fnm"
 # Idea (Jetbeans editor)
 IDEA_PATH="$HOME/Applications/idea/bin"
 # Thesis related
-THESIS_PATH="$HOME/Documents/thesis/haai/executables/bin"
+THESIS_PATH="$HOME/Documents/Thesis/haai/executables/bin"
 # Meta-programming and reflection
 PHARO_PATH="$HOME/Documents/pharo-launcher/"
 
 PATHS=(
-    "$FNM_PATH",
-    "$IDEA_PATH",
-    "$THESIS_PATH",
+    "$FNM_PATH"
+    "$IDEA_PATH"
+    "$THESIS_PATH"
     "$PHARO_PATH"
 )
-
 for dir in "${PATHS[@]}"; do
-    [[ -d "$dir" ]] && path=("$dir" $path)
+    [[ -d "$dir" ]] && path=("$dir" "${path[@]}")
 done
 
 # fnm environment setup
