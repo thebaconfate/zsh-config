@@ -99,3 +99,17 @@ done
 [[ -d "$HOME/.local/share/fnm" ]] && eval "$(fnm env)"
 eval $(thefuck --alias)
 
+
+# Created by `pipx` on 2026-03-30 20:17:54
+path+="$HOME/.local/bin"
+
+export ASDF_DIR="$HOME/.asdf"
+
+if [ -f "$ASDF_DIR/asdf.sh" ]; then
+  . "$ASDF_DIR/asdf.sh"
+fi
+
+# Ensure shims have highest priority
+path=("$ASDF_DIR/shims" "$ASDF_DIR/bin" $path)
+
+export PATH="/opt/nvim/bin:$PATH"
