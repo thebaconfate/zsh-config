@@ -4,118 +4,69 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git z zsh-syntax-highlighting zsh-autosuggestions)
+# zsh-syntax-highlighting must be the last plugin
+plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='nvim'
-else
-    export EDITOR='vim'
-fi
-
-# fnm
-FNM_PATH="$HOME/.local/share/fnm"
-# Idea (Jetbeans editor)
-IDEA_PATH="$HOME/Applications/idea/bin"
-# Thesis related
-THESIS_PATH="$HOME/Documents/Thesis/haai/executables/bin"
-# Meta-programming and reflection
-PHARO_PATH="$HOME/Documents/pharo-launcher/"
-
-PATHS=(
-    "$FNM_PATH"
-    "$IDEA_PATH"
-    "$THESIS_PATH"
-    "$PHARO_PATH"
-)
-for dir in "${PATHS[@]}"; do
-    [[ -d "$dir" ]] && path=("$dir" "${path[@]}")
-done
-
-# fnm environment setup
-[[ -d "$HOME/.local/share/fnm" ]] && eval "$(fnm env)"
-eval $(thefuck --alias)
-
-
-# Created by `pipx` on 2026-03-30 20:17:54
-path+="$HOME/.local/bin"
-
+# Tool environment variables
 export ASDF_DIR="$HOME/.asdf"
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
-if [ -f "$ASDF_DIR/asdf.sh" ]; then
-  . "$ASDF_DIR/asdf.sh"
+# pnpm lives in a different place on macOS and Linux
+if [[ -d "$HOME/Library/pnpm" ]]; then
+    export PNPM_HOME="$HOME/Library/pnpm"
+elif [[ -d "$HOME/.local/share/pnpm" ]]; then
+    export PNPM_HOME="$HOME/.local/share/pnpm"
 fi
 
-# Ensure shims have highest priority
-path=("$ASDF_DIR/shims" "$ASDF_DIR/bin" $path)
+# Raspberry Pi Pico C/C++ SDK
+[[ -d "$HOME/pico/pico-sdk" ]] && export PICO_SDK_PATH="$HOME/pico/pico-sdk"
 
-export PATH="/opt/nvim/bin:$PATH"
+# Prepend directories to PATH, skipping any that don't exist on this machine.
+# Later entries end up first, so they win when a command exists in several.
+prepend_path() {
+    for dir in "$@"; do
+        [[ -d "$dir" ]] && path=("$dir" $path)
+    done
+}
 
+school_paths=(
+    "$HOME/Documents/Thesis/haai/executables/bin"   # thesis
+    "$HOME/Documents/pharo-launcher"                # meta-programming and reflection
+)
 
-# Raspberry Pi Pico C/C++ SDK setup
-if [[ -d "$HOME/pico/pico-sdk" ]]; then
-    export PICO_SDK_PATH="$HOME/pico/pico-sdk"
+editor_paths=(
+    "$HOME/Applications/idea/bin"                   # IntelliJ IDEA
+    "/opt/nvim/bin"                                 # neovim
+)
+
+package_manager_paths=(
+    "$HOME/.local/share/fnm"
+    "$ASDF_DIR/bin"
+    "$ASDF_DIR/shims"
+    "$HOME/.local/bin"                              # pipx, mise
+    "$HOME/.cargo/bin"
+    ${PNPM_HOME:+"$PNPM_HOME/bin"}
+)
+
+prepend_path "${school_paths[@]}" "${editor_paths[@]}" "${package_manager_paths[@]}"
+
+# Preferred editor: neovim if installed, vim otherwise
+if (( $+commands[nvim] )); then
+    export EDITOR="nvim"
+else
+    export EDITOR="vim"
+fi
+
+# Tool setup, only for tools installed on this machine
+[[ -f "$ASDF_DIR/asdf.sh" ]] && . "$ASDF_DIR/asdf.sh"
+(( $+commands[thefuck] )) && eval "$(thefuck --alias)"
+
+# Version managers: prefer mise, fall back to fnm and pyenv where it isn't installed
+if (( $+commands[mise] )); then
+    eval "$(mise activate zsh)"
+else
+    (( $+commands[fnm] )) && eval "$(fnm env)"
+    (( $+commands[pyenv] )) && eval "$(pyenv init -)"
 fi
