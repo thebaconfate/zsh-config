@@ -116,6 +116,7 @@ export PATH="/opt/nvim/bin:$PATH"
 
 
 # Raspberry Pi Pico C/C++ SDK setup
-if [[ -d "$HOME/pico/pico-sdk" ]]; then
-    export PICO_SDK_PATH="$HOME/pico/pico-sdk"
-fi
+[[ -d "$HOME/pico-sdk" ]] && export PICO_SDK_PATH="$HOME/pico-sdk"
+
+# Railway CLI
+[ -f "$HOME/.railway/env" ] && source "$HOME/.railway/env"
