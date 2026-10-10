@@ -1,11 +1,34 @@
 typeset -U path
 
+# Homebrew's environment (PATH, MANPATH, ...). ~/.zprofile sets it for login shells; it's
+# repeated here so this file works on its own, because the plugin checks below look for
+# Homebrew-installed tools. Skipped when the environment already has it (HOMEBREW_PREFIX
+# is inherited from .zprofile or the parent shell), since `brew shellenv` costs ~30ms.
+if [[ -z "$HOMEBREW_PREFIX" ]]; then
+    for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+        [[ -x "$brew_bin" ]] && { eval "$("$brew_bin" shellenv)"; break; }
+    done
+    unset brew_bin
+fi
+
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
 
-# zsh-syntax-highlighting must be the last plugin
-plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
+# Update oh-my-zsh quietly instead of asking [Y/n] in whichever new shell opens first
+zstyle ':omz:update' mode auto
+
+# Completion treats - and _ as the same character: my_f<Tab> also finds my-file
+HYPHEN_INSENSITIVE="true"
+
+# zsh-syntax-highlighting must be the last plugin.
+# gcloud only adds tab completion, and stays silent on machines without the SDK.
+plugins=(git z fzf gcloud zsh-autosuggestions zsh-syntax-highlighting)
+# zoxide replaces the z plugin where it's installed (both define `z`; see the end of
+# this file). Machines without zoxide keep the plugin.
+(( $+commands[zoxide] )) && plugins=(${plugins:#z})
+# fzf: Ctrl-R fuzzy history search, Ctrl-T file picker. Skipped where fzf isn't installed.
+(( $+commands[fzf] )) || plugins=(${plugins:#fzf})
 
 source $ZSH/oh-my-zsh.sh
 
@@ -73,3 +96,7 @@ else
     (( $+commands[fnm] )) && eval "$(fnm env)"
     (( $+commands[pyenv] )) && eval "$(pyenv init -)"
 fi
+
+# zoxide, a smarter cd: `z foo` jumps to the most-used match, `zi` opens an fzf picker.
+# Keep it last: it has to come after compinit (run by oh-my-zsh) for its completions.
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
