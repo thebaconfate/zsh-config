@@ -1,0 +1,8 @@
+# Tools .zshrc uses, installed by mise. install.sh links this file to
+# ~/.config/mise/conf.d/zsh.toml, where mise merges it with your global config; without mise,
+# install.sh gets them from the package manager instead.
+# (It's in a mise/ folder under another name because mise would load a mise.toml in the
+# repo root as a project config, and ask to trust it.)
+[tools]
+fzf = "latest"    # fzf plugin: Ctrl-R history search, Ctrl-T file picker
+zoxide = "latest" # `z` and `zi`, in place of the z plugin

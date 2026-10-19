@@ -10,6 +10,7 @@ set -euo pipefail
 DRY_RUN=0
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
 
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ZSH="${ZSH:-$HOME/.oh-my-zsh}"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
 
@@ -19,6 +20,23 @@ run() {
     else
         "$@"
     fi
+}
+
+# link <file in this repo> <destination>: a real file already there is moved aside, never
+# overwritten; an existing link to somewhere else is just re-pointed
+link() {
+    local src="$1" dest="$2"
+    if [[ -L "$dest" && "$(readlink "$dest")" == "$src" ]]; then
+        echo "$dest: already linked"
+        return
+    fi
+    if [[ -e "$dest" && ! -L "$dest" ]]; then
+        echo "$dest: moving the existing file to $dest.bak"
+        run mv "$dest" "$dest.bak"
+    fi
+    echo "$dest: linking to $src"
+    run mkdir -p "$(dirname "$dest")"
+    run ln -sfn "$src" "$dest"
 }
 
 # 1. oh-my-zsh. --keep-zshrc leaves the symlinked ~/.zshrc alone; --unattended stops the
@@ -46,8 +64,9 @@ for repo in zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting; do
 done
 
 # 3. Programs the plugins rely on: fzf (fzf plugin) and zoxide (replaces the z plugin).
-#    From the system package manager rather than mise: .zshrc picks its plugins before
-#    `mise activate` runs, so tools installed through mise aren't on PATH at that point.
+#    Through mise where it's installed: mise/zsh.toml is linked in as an extra global config,
+#    so every machine gets the same versions. The system package manager otherwise. .zshrc
+#    runs `mise activate` before it picks its plugins, so it finds them either way.
 install_tool() {
     local tool="$1"
     if command -v "$tool" >/dev/null 2>&1; then
@@ -69,8 +88,17 @@ install_tool() {
         echo "    no supported package manager (dnf, apt, pacman, brew); install $tool by hand"
     fi
 }
-install_tool fzf
-install_tool zoxide
+if command -v mise >/dev/null 2>&1; then
+    link "$REPO/mise/zsh.toml" "${XDG_CONFIG_HOME:-$HOME/.config}/mise/conf.d/zsh.toml"
+    echo "mise: installing fzf and zoxide"
+    run mise install
+    # This script runs without `mise activate`; the shims put zoxide on PATH for step 4
+    export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims:$PATH"
+    hash -r
+else
+    install_tool fzf
+    install_tool zoxide
+fi
 
 # 4. Carry over the z plugin's history (~/.z) the first time zoxide is set up.
 if [[ -f "$HOME/.z" ]] && command -v zoxide >/dev/null 2>&1 && [[ -z "$(zoxide query --list 2>/dev/null)" ]]; then
