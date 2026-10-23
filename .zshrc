@@ -55,7 +55,12 @@ package_manager_paths=(
     ${PNPM_HOME:+"$PNPM_HOME/bin"}
 )
 
-prepend_path "${school_paths[@]}" "${editor_paths[@]}" "${package_manager_paths[@]}"
+# Keg-only Homebrew formulae, which brew doesn't link into $HOMEBREW_PREFIX/bin
+homebrew_keg_paths=(
+    "$HOMEBREW_PREFIX/opt/postgresql@17/bin"        # psql
+)
+
+prepend_path "${school_paths[@]}" "${editor_paths[@]}" "${package_manager_paths[@]}" "${homebrew_keg_paths[@]}"
 
 # Version managers: prefer mise, fall back to asdf, fnm and pyenv where it isn't installed.
 # Before the plugin list, since fzf and zoxide can come from mise (mise/zsh.toml), and
