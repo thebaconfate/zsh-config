@@ -63,7 +63,8 @@ for repo in zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting; do
     fi
 done
 
-# 3. Programs the plugins rely on: fzf (fzf plugin) and zoxide (replaces the z plugin).
+# 3. Programs the plugins rely on: fzf (fzf plugin), zoxide (replaces the z plugin) and bat
+#    (previews in fzf's Ctrl-T picker).
 #    Through mise where it's installed: mise/zsh.toml is linked in as an extra global config,
 #    so every machine gets the same versions. The system package manager otherwise. .zshrc
 #    runs `mise activate` before it picks its plugins, so it finds them either way.
@@ -90,7 +91,7 @@ install_tool() {
 }
 if command -v mise >/dev/null 2>&1; then
     link "$REPO/mise/zsh.toml" "${XDG_CONFIG_HOME:-$HOME/.config}/mise/conf.d/zsh.toml"
-    echo "mise: installing fzf and zoxide"
+    echo "mise: installing fzf, zoxide and bat"
     run mise install
     # This script runs without `mise activate`; the shims put zoxide on PATH for step 4
     export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims:$PATH"
@@ -98,6 +99,8 @@ if command -v mise >/dev/null 2>&1; then
 else
     install_tool fzf
     install_tool zoxide
+    # Debian and Ubuntu install bat as batcat
+    command -v batcat >/dev/null 2>&1 || install_tool bat
 fi
 
 # 4. Carry over the z plugin's history (~/.z) the first time zoxide is set up.

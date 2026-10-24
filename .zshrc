@@ -104,6 +104,14 @@ fi
 # Tool setup, only for tools installed on this machine
 (( $+commands[thefuck] )) && eval "$(thefuck --alias)"
 
+# fzf's Ctrl-T picker previews files with bat (batcat on Debian and Ubuntu), folders with ls
+for _bat in bat batcat; do
+    (( $+commands[$_bat] )) || continue
+    export FZF_CTRL_T_OPTS="--preview '[[ -d {} ]] && ls -A {} || $_bat --color=always --style=numbers --line-range=:300 {}'"
+    break
+done
+unset _bat
+
 # zoxide, a smarter cd: `z foo` jumps to the most-used match, `zi` opens an fzf picker.
 # Keep it last: it has to come after compinit (run by oh-my-zsh) for its completions.
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
