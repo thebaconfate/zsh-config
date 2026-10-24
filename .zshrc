@@ -38,7 +38,6 @@ prepend_path() {
 
 school_paths=(
     "$HOME/Documents/Thesis/haai/executables/bin"   # thesis
-    "$HOME/Documents/pharo-launcher"                # meta-programming and reflection
 )
 
 editor_paths=(
