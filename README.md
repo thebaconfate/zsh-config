@@ -11,6 +11,6 @@ ln -s ~/.dotfiles/zsh-config/.zshrc ~/.zshrc
 
 `install.sh` installs what the plugin list needs and skips anything already present:
 oh-my-zsh, `zsh-autosuggestions` and `zsh-syntax-highlighting` (bundled with oh-my-zsh
-since 2026-09-20, cloned for older installs), and `fzf` and `zoxide` through dnf, apt,
-pacman or brew, checked in that order. gcloud is not installed: its plugin only adds
-completion and stays silent without the SDK.
+since 2026-09-20, cloned for older installs), and `fzf`, `zoxide` and `bat` (file previews
+in fzf's Ctrl-T picker) through mise, or else dnf, apt, pacman or brew, checked in that order.
+gcloud is not installed: its plugin only adds completion and stays silent without the SDK.

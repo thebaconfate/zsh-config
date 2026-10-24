@@ -6,3 +6,4 @@
 [tools]
 fzf = "latest"    # fzf plugin: Ctrl-R history search, Ctrl-T file picker
 zoxide = "latest" # `z` and `zi`, in place of the z plugin
+bat = "latest"    # file previews in fzf's Ctrl-T picker
