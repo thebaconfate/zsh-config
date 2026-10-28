@@ -51,10 +51,13 @@ else
         "" --unattended --keep-zshrc
 fi
 
-# 2. Community plugins. oh-my-zsh bundles these since 2026-09-20; older installs need them
-#    cloned into $ZSH_CUSTOM/plugins, where oh-my-zsh looks first.
-for repo in zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting; do
-    name="${repo#*/}"
+# 2. Community plugins, as <GitHub repo>:<plugin name>. oh-my-zsh bundles the zsh-users ones
+#    since 2026-09-20, not you-should-use; what's missing is cloned into $ZSH_CUSTOM/plugins,
+#    where oh-my-zsh looks first.
+for plugin in zsh-users/zsh-autosuggestions:zsh-autosuggestions \
+    zsh-users/zsh-syntax-highlighting:zsh-syntax-highlighting \
+    MichaelAquilina/zsh-you-should-use:you-should-use; do
+    repo="${plugin%%:*}" name="${plugin#*:}"
     if [[ -d "$ZSH/plugins/$name" || -d "$ZSH_CUSTOM/plugins/$name" ]]; then
         echo "$name: already available"
     else
