@@ -84,7 +84,10 @@ HYPHEN_INSENSITIVE="true"
 
 # zsh-syntax-highlighting must be the last plugin.
 # gcloud only adds tab completion, and stays silent on machines without the SDK.
-plugins=(git z fzf gcloud zsh-autosuggestions zsh-syntax-highlighting)
+# you-should-use: after a command that has an alias (git status), names the alias (gst).
+plugins=(git z fzf gcloud you-should-use zsh-autosuggestions zsh-syntax-highlighting)
+# Not bundled with oh-my-zsh: skipped until install.sh has cloned it
+[[ -d "${ZSH_CUSTOM:-$ZSH/custom}/plugins/you-should-use" ]] || plugins=(${plugins:#you-should-use})
 # zoxide replaces the z plugin where it's installed (both define `z`; see the end of
 # this file). Machines without zoxide keep the plugin.
 (( $+commands[zoxide] )) && plugins=(${plugins:#z})
