@@ -114,6 +114,9 @@ for _bat in bat batcat; do
 done
 unset _bat
 
+# Machine-specific setup that isn't in the dotfiles repo
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
 # zoxide, a smarter cd: `z foo` jumps to the most-used match, `zi` opens an fzf picker.
 # Keep it last: it has to come after compinit (run by oh-my-zsh) for its completions.
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
